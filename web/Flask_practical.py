@@ -1,17 +1,79 @@
 
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify,g,abort
+import functools
+import json
+import sqlalchemy as sqla
+from sqlalchemy import create_engine, text
+import traceback
+import glob
+import os
+from pprint import pprint
+import json
+import requests
+import time
+from IPython.display import display
+
+
+
+#from jinjia2 import Template
+#from flask_sqlalchemy import SQLAlchemy
+#from flask_mysqldb import MySQL
 # app=Flask(__name__)
 
-# @app.route("/")
-# def hello():
-#     return "Hello World!!!!"
 
-# if __name__=="__main__":
-#     app.run(debug=True)
-    
-    
 app=Flask(__name__, static_url_path='')
+#app.config.from_object('config')
+
+url = "dbikes.cznzccwi0urk.us-east-1.rds.amazonaws.com"
+user = "admin"
+database= "dbikes"
+port = "3306"
+password = "Foryiuxing18!"
+
+#engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
+#engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
+
+def connect_to_database():
+    
+    #return engine = create_engine("mysql://{user}:{password}@{url}:{port}/{database}".format(config.USER, config.PASSWORD, config.URI, config.PORT, config.DB), echo=True)
+    #engine = create_engine("mysql://{user}:{password}@{url}:{port}/{database}".format(user, password, url, port, database), echo=True)
+    #engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
+    engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
+    return engine
+    
+def get_db(): 
+    db = getattr(g, '_database', None) 
+    if db is None: 
+        db = g._database = connect_to_database() 
+    return db
+
+@app.teardown_appcontext 
+def close_connection(exception): 
+    db = getattr(g, '_database', None) 
+    if db is not None: 
+        db.close() 
+ 
+
+
+@app.route("/stations")
+@functools.lru_cache(maxsize=128)
+def get_stations():
+    engine = get_db()
+    sql = "select * from station ;"
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text(sql)).fetchall()
+            print('#found {} stations', len(rows), rows)
+            # use this formula to turn the rows into a list of dicts
+            return jsonify([row._asdict() for row in rows])
+    except:
+        print(traceback.format_exc())
+        return "error in get_stations", 404
+
+    
+    
+
 @app.route('/page')
 def page():
     #return app.send_static_file('index.html')#only use in the static files
