@@ -13,7 +13,9 @@ import json
 import requests
 import time
 from IPython.display import display
-
+import pandas as pd
+from sqlalchemy import create_engine
+from datetime import datetime, timedelta
 
 
 #from jinjia2 import Template
@@ -48,6 +50,12 @@ def get_db():
         db = g._database = connect_to_database() 
     return db
 
+def get_db_raw(): 
+    db2 = getattr(g, '_database', None) 
+    if db2 is None: 
+        db2 = g._database = connect_to_database().raw_connection() 
+    return db2
+
 @app.teardown_appcontext 
 def close_connection(exception): 
     db = getattr(g, '_database', None) 
@@ -70,6 +78,27 @@ def get_stations():
     except:
         print(traceback.format_exc())
         return "error in get_stations", 404
+    
+    
+    
+    
+@app.route("/occupancy/<int:station_id>")
+def get_occupancy(station_id):
+    engine = get_db_raw()
+    
+
+    df = pd.read_sql_query("select * from availability_log where number = %(number)s", engine, params={"number": station_id})
+    
+    df['last_update_date'] = pd.to_datetime(df.last_update, unit='ms')
+    df.set_index('last_update_date', inplace=True)
+    
+    
+    res = df['available_bike_stands'].resample('1w').mean()
+    #res['dt'] = df.index
+    
+    
+    print(res)
+    return jsonify(data=json.dumps(list(zip(map(lambda x: x.isoformat(), res.index), res.values))))
 
     
     
@@ -80,10 +109,13 @@ def page():
     #return "Hello!!!!cat!!!!"
     return render_template('test_part.html')
 
-@app.route('/')
+@app.route('/sample')
 def index():
-#     return "Hello!!!!cat!!!!"
-      return '<h1>Hi!</h1>'
+      return render_template('index.html')
+  
+# @app.route('/mapsample')
+# def index():
+#       return render_template('Page-9.html')
 
 #這句話要放在最後才能運作整個程序
 if __name__=="__main__":

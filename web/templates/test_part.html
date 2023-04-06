@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head>
- <title>Add Map</title>
- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
- <link rel="stylesheet" href="{{ url_for('static', filename='style_1.css') }}">
- <script type="module" src="{{ url_for('static', filename='index_1.js') }}"></script>
-</head>
-<body>
-<div id="map"></div>
-<!--The `defer` attribute causes the callback to execute after the full HTML
-document has been parsed.-->
-<script
- src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA84zGIEaAVXzrTbhAbGUYf50z2bryTnLc&callback=initMap&v=weekly" defer
-></script>
-</body>
+
+<html lang="en">
+  <head>
+    
+    <title>Add Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'style_1.css') }}" />
+    <script type="module" src="{{ url_for('static', filename = 'index_1.js') }}"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <!--  The `defer` attribute causes the callback to execute after the full HTML
+document has been parsed.  -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA84zGIEaAVXzrTbhAbGUYf50z2bryTnLc&callback=initMap&v=weekly" defer></script>
+  </body>
 </html>
