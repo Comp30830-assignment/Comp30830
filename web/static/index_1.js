@@ -43,45 +43,44 @@ function addMarkers(stations) {
           }
         };
 
-        var jqxhr = $.getJSON($SCRIPT_ROOT + "/occupancy/" + marker.station_number, function(data) {
-            data = JSON.parse(data.data);
-            console.log('data', data);    
-            var node = document.createElement('div'),
-            infowindow = new google.maps.InfoWindow(),
-            chart = new google.visualization.ColumnChart(node);
-            var chart_data = new google.visualization.DataTable();
-            chart_data.addColumn('datetime', 'Time of Day');
-            chart_data.addColumn('number', '#');
-            _.forEach(data, function(row){chart_data.addRow([new Date(row[0]), row[1]]);})
-            chart.draw(chart_data, options);
-            infowindow.setContent(node);
-            infowindow.open(marker.getMap(), marker);
-        }).fail(function() {
-            console.log( "error" );
-        })
+//        var jqxhr = $.getJSON($SCRIPT_ROOT + "/occupancy/" + marker.station_number, function(data) {
+//            data = JSON.parse(data.data);
+//            console.log('data', data);
+//            var node = document.createElement('div'),
+//            infowindow = new google.maps.InfoWindow(),
+//            chart = new google.visualization.ColumnChart(node);
+//            var chart_data = new google.visualization.DataTable();
+//            chart_data.addColumn('datetime', 'Time of Day');
+//            chart_data.addColumn('number', '#');
+//            _.forEach(data, function(row){chart_data.addRow([new Date(row[0]), row[1]]);})
+//            chart.draw(chart_data, options);
+//            infowindow.setContent(node);
+//            infowindow.open(marker.getMap(), marker);
+//        }).fail(function() {
+//            console.log( "error" );
+//        })
 
-        // const contentString = '<div>' +
-        // '<h3 id="firstHeading" class="firstHeading">'+station.name+'</h3>' +
-        // '<p><strong>Station Address:   </strong>'+station.address+'</p>' +
-        // '<p><strong>Bike Stands:   </strong>'+station.bike_stands+'</p>' +
-        // '<p><strong>Bike Number:   </strong>'+station.number+'</p>' +
-        // '<p><strong>Business Status:   </strong>'+station.status+'</p>' +
-        // '</div>';
-        // const contentString =node;
+         const contentString = '<div>' +
+         '<h3 id="firstHeading" class="firstHeading">'+station.name+'</h3>' +
+         '<p><strong>Station Address:   </strong>'+station.address+'</p>' +
+         '<p><strong>Bike Stands:   </strong>'+station.bike_stands+'</p>' +
+         '<p><strong>Bike Number:   </strong>'+station.number+'</p>' +
+         '<p><strong>Business Status:   </strong>'+station.status+'</p>' +
+         '</div>';
+//         const contentString =node;
 
-        // const infowindow = new google.maps.InfoWindow({
-        //   content: contentString
-        // });
+         const infowindow = new google.maps.InfoWindow({
+           content: contentString
+         });
 
-        // marker.addListener("click", () => {
-        //   infowindow.open({
-        //     anchor: marker,
-        //     map,
-        //   });
-        // });       
+         marker.addListener("click", () => {
+           infowindow.open({
+             anchor: marker,
+             map,
+           });
+         });
     }
 }
-
 
 
 function getStations() {
@@ -93,6 +92,18 @@ function getStations() {
         });
 }
 
+function showWeatherInfo(data) {
+
+}
+
+function getWeather() {
+    fetch("/weather")
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("fetch response", typeof data);
+            showWeatherInfo(data);
+        });
+}
 
 // // Initialize and add the map
 // function initMap() {
@@ -143,6 +154,7 @@ function initMap() {
         center: dublin,
     });
     getStations();
+    getWeather();
     const contentString =
     '<div id="content">' +
     '<div id="siteNotice">' +

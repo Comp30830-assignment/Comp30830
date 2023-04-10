@@ -9,6 +9,14 @@
     <script type="module" src="{{ url_for('static', filename = 'index_1.js') }}"></script>
   </head>
   <body>
+    <table>
+    {% for row in weatherInfo %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}°C</td>
+        </tr>
+    {% endfor %}
+    </table>
     <div id="map"></div>
     <!--  The `defer` attribute causes the callback to execute after the full HTML
 document has been parsed.  -->

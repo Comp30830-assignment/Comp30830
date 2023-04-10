@@ -22,7 +22,7 @@ url = "https://api.openweathermap.org/data/2.5/weather?q=Dublin,IE&units=metric&
 import datetime
 def write_to_file2(text):
     now = datetime.datetime.now()
-    with open(f"data/weather_{now}".replace(" ", "_"), "w") as f:
+    with open(f"data/weather_{now}".replace(" ", "_").replace(":", "-"), "w") as f:
         f.write(text) 
         
 def weather_to_db(text):
