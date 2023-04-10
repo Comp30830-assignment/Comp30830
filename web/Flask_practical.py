@@ -82,6 +82,25 @@ def get_stations():
     
     
     
+# @app.route("/occupancy/<int:station_id>")
+# def get_occupancy(station_id):
+#     engine = get_db_raw()
+    
+
+#     df = pd.read_sql_query("select * from availability_log where number = %(number)s", engine, params={"number": station_id})
+    
+#     df['last_update_date'] = pd.to_datetime(df.last_update, unit='ms')
+#     df.set_index('last_update_date', inplace=True)
+    
+    
+#     res = df['available_bike_stands'].resample('1w').mean()
+#     #res['dt'] = df.index
+    
+    
+#     print(res)
+#     return jsonify(data=json.dumps(list(zip(map(lambda x: x.isoformat(), res.index), res.values))))
+
+
 @app.route("/occupancy/<int:station_id>")
 def get_occupancy(station_id):
     engine = get_db_raw()
@@ -92,16 +111,43 @@ def get_occupancy(station_id):
     df['last_update_date'] = pd.to_datetime(df.last_update, unit='ms')
     df.set_index('last_update_date', inplace=True)
     
+    end_date = df.index.max()
+    start_date = end_date - timedelta(days=6)
+    res = df.loc[start_date:end_date]['available_bike_stands'].resample('1D').mean()
     
-    res = df['available_bike_stands'].resample('1w').mean()
+    #res = df['available_bike_stands'].resample('1D').mean()
     #res['dt'] = df.index
-    
-    
+    res = res.dropna()  # 过滤掉 NaN 值
     print(res)
-    return jsonify(data=json.dumps(list(zip(map(lambda x: x.isoformat(), res.index), res.values))))
+    
+    # return jsonify(data=json.dumps(list(zip(map(lambda x: x.isoformat(), res.index), res.values))))
+    return jsonify(data=json.dumps(list(zip(map(lambda x: x.strftime('%Y-%m-%d'), res.index), res.values))))
 
+    # print(res)
+    # return jsonify(data=json.dumps(list(zip(map(lambda x: x.isoformat(), res.index), res.values))))   
+
+
+@app.route("/occupancy2/<int:station_id>/<string:date>")
+def get_occupancy2(station_id, date):
+    engine = get_db_raw()
+
+    df = pd.read_sql_query("select * from availability_log where number = %(number)s", engine, params={"number": station_id})
+
+    df['last_update_date'] = pd.to_datetime(df.last_update, unit='ms')
+    df.set_index('last_update_date', inplace=True)
+
+    input_date = pd.to_datetime(date)  # 将输入的日期字符串转换为 datetime 对象
+    start_date = input_date.replace(hour=0, minute=0, second=0)  # 设置开始时间为输入日期的凌晨 00:00:00
+    end_date = input_date.replace(hour=23, minute=59, second=59)  # 设置结束时间为输入日期的晚上 23:59:59
+
+    res = df.loc[start_date:end_date]['available_bike_stands'].resample('1H').mean()
+
+    res = res.dropna()  # 过滤掉 NaN 值
+    print(res)
+
+    return jsonify(data=json.dumps(list(zip(map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'), res.index), res.values))))
     
-    
+
 
 @app.route('/page')
 def page():
