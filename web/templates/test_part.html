@@ -9,14 +9,13 @@
     <script type="module" src="{{ url_for('static', filename = 'index_1.js') }}"></script>
   </head>
   <body>
-    <table>
+    <div>
     {% for row in weatherInfo %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}°C</td>
-        </tr>
+        <div id="temperature">{{ row[0] }}°C</div>
+        <div id="icon"><img id="wicon" src="{{icon_src}}" alt="Weather icon"></div>
+        <div id="description">{{ row[1] }}</div>
     {% endfor %}
-    </table>
+    </div>
     <div id="map"></div>
     <!--  The `defer` attribute causes the callback to execute after the full HTML
 document has been parsed.  -->

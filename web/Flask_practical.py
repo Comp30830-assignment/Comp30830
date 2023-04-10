@@ -106,10 +106,12 @@ def get_occupancy(station_id):
 def page():
     engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{url}:{port}/{database}", echo=True)
     sql = """
-    select description, temperature from weather order by dt desc limit 1;
+    select temp, description from weather_newest order by dt desc limit 1;
     """
     weatherInfo = engine.execute(sql).fetchall()
-    return render_template('test_part.html', weatherInfo=weatherInfo)
+    icon = engine.execute("select icon from weather_newest order by dt desc limit 1;").fetchone()
+    icon_src = "http://openweathermap.org/img/w/" + str(icon[0]) + ".png"
+    return render_template('test_part.html', weatherInfo=weatherInfo, icon_src=icon_src)
     #return app.send_static_file('index.html')#only use in the static files
     #return "Hello!!!!cat!!!!"
     # return render_template('test_part.html')
