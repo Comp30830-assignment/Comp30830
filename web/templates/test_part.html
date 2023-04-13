@@ -2,13 +2,15 @@
 
 <html lang="en">
   <head>
-    
+
     <title>Add Map</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'style_1.css') }}" />
     <script type="module" src="{{ url_for('static', filename = 'index_1.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename = 'niu.js') }}"></script>
   </head>
   <body>
+    <button id="contact-btn">Contact Us</button>
     <div>
     {% for row in weatherInfo %}
         <div id="temperature">{{ row[0] }}°C</div>
@@ -20,5 +22,8 @@
     <!--  The `defer` attribute causes the callback to execute after the full HTML
 document has been parsed.  -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA84zGIEaAVXzrTbhAbGUYf50z2bryTnLc&callback=initMap&v=weekly" defer></script>
+    <section id="contact">
+      <div>contact Info</div>
+    </section>
   </body>
 </html>

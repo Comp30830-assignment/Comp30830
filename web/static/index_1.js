@@ -92,18 +92,7 @@ function getStations() {
         });
 }
 
-function showWeatherInfo(data) {
 
-}
-
-function getWeather() {
-    fetch("/weather")
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("fetch response", typeof data);
-            showWeatherInfo(data);
-        });
-}
 
 // // Initialize and add the map
 // function initMap() {

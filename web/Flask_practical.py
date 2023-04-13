@@ -165,6 +165,10 @@ def page():
 @app.route('/sample')
 def index():
       return render_template('index.html')
+
+@app.route('/examfile')
+def exam():
+      return render_template('exam.html')
   
 # @app.route('/mapsample')
 # def index():
