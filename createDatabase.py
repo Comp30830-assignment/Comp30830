@@ -1,74 +1,74 @@
-import sqlalchemy as sqla
 from sqlalchemy import create_engine
-import traceback
-import glob
-import os
-from pprint import pprint
-import simplejson as json
-import requests
-import time
-from IPython.display import display
+import sqlalchemy as sqla
 
-URI = "dbikes.cizsqkc3mbbs.us-east-1.rds.amazonaws.com"
-PORT = "3306"
-DB = "sys"
-USER = "admin"
-PASSWORD = "niuzhaozhong"
-# database driver is mysqlconnector
-engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
-# sql = """
-# CREATE DATABASE IF NOT EXISTS dbikes;
-# """
-# engine.execute(sql)
+url = "dbikes.cznzccwi0urk.us-east-1.rds.amazonaws.com"
+user = "admin"
+database= "dbikes"
+port = "3306"
+password = "Foryiuxing18!"
 
-# sql = """
-# use dbikes
-# """
-# engine.execute(sql)
+engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{url}:{port}/{database}", echo=True)
+
+# def createdb():
+#     sql = """
+#     CREATE DATABASE IF NOT EXISTS dbikes;
+#     """
+#     engine.execute(sql)
 #
-# sql = """
-# CREATE TABLE IF NOT EXISTS station (
-# address VARCHAR(256),
-# banking INTEGER,
-# bike_stands INTEGER,
-# bonus INTEGER,
-# contract_name VARCHAR(256),
-# name VARCHAR(256),
-# number INTEGER,
-# position_lat REAL,
-# position_lng REAL,
-# status VARCHAR(256)
-# )
-# """
-# try:
-#     res = engine.execute(sql)
-#     print(res.fetchall())
-# except Exception as e:
-#     print(e)
+#     sql = """
+#     use dbikes
+#     """
+#     engine.execute(sql)
 #
-# sql = """
-# use dbikes
-# """
-# engine.execute(sql)
+#     sql = """
+#     CREATE TABLE IF NOT EXISTS station (
+#     address VARCHAR(256),
+#     banking INTEGER,
+#     bike_stands INTEGER,
+#     bonus INTEGER,
+#     contract_name VARCHAR(256),
+#     name VARCHAR(256),
+#     number INTEGER,
+#     position_lat REAL,
+#     position_lng REAL,
+#     status VARCHAR(256)
+#     )
+#     """
+#     try:
+#         res = engine.execute(sql)
+#         print(res.fetchall())
+#     except Exception as e:
+#         print(e)
 #
-# sql = """
-# CREATE TABLE IF NOT EXISTS availability (
-# number INTEGER,
-# available_bikes INTEGER,
-# available_bike_stands INTEGER,
-# last_update INTEGER
-# )
-# """
-# try:
-#     res = engine.execute(sql)
-#     print(res.fetchall())
-# except Exception as e:
-#     print(e)
+#     sql = """
+#     use dbikes
+#     """
+#     engine.execute(sql)
+#
+#     sql = """
+#     CREATE TABLE IF NOT EXISTS availability (
+#     number INTEGER,
+#     available_bikes INTEGER,
+#     available_bike_stands INTEGER,
+#     last_update BIGINTEGER
+#     )
+#     """
+#     try:
+#         res = engine.execute(sql)
+#         print(res.fetchall())
+#     except Exception as e:
+#         print(e)
 
-DB = "dbikes"
-engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASSWORD, URI, PORT, DB), echo=True)
-
+# URI = "dbikes.cizsqkc3mbbs.us-east-1.rds.amazonaws.com"
+# PORT = "3306"
+# DB = "dbikes"
+# USER = "admin"
+# PASSWORD = "niuzhaozhong"
+# # database driver is mysqlconnector
+# engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASSWORD, URI, PORT, DB), echo=True)
+#
+#
 metadata = sqla.MetaData()
 
 station = sqla.Table("station", metadata,
