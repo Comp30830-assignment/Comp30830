@@ -16,8 +16,13 @@ function getStations() {
               (item) => item.number === station.number
             );
             return { ...station, ...stationAvailability };
+<<<<<<< Updated upstream
           });
 
+=======
+          }).sort((a, b) => b.available_bikes - a.available_bikes); // 根据 available_bikes 排序
+          
+>>>>>>> Stashed changes
           console.log("fetch response", typeof stationsData);
           addMarkers(stationsData);
           drawHeatmap(stationsData);
@@ -137,6 +142,7 @@ let currentInfoWindow = null;
 
 function addMarkers(stations) {
 
+<<<<<<< Updated upstream
 
 
   for (const station of stations) {
@@ -144,6 +150,42 @@ function addMarkers(stations) {
   
     const availableBikes = station.available_bikes;
 
+=======
+  const emptyIcon = {
+    url: "none.png",
+    scaledSize: new google.maps.Size(38, 38),
+    anchor: new google.maps.Point(24, 50),
+  };
+
+  const normalIcon = {
+    url: "point.png",
+    scaledSize: new google.maps.Size(60, 60),
+    anchor: new google.maps.Point(25, 55),
+  };
+  
+
+    const top1Icon = {
+      url: "top1_marker1.png",
+      scaledSize: new google.maps.Size(43, 50),
+      anchor: new google.maps.Point(25, 55),
+    };
+    
+    const top2Icon = {
+      url: "top2_marker1.png",
+      scaledSize: new google.maps.Size(43, 50),
+      anchor: new google.maps.Point(23, 55),
+    };
+    
+    const top3Icon = {
+      url: "top3_marker1.png",
+      scaledSize: new google.maps.Size(44, 50),
+      anchor: new google.maps.Point(23, 55),
+    };
+  
+  for (const [index, station] of stations.entries()) {
+
+    const availableBikes = station.available_bikes;
+>>>>>>> Stashed changes
     
     const hoverIcon = {
       url: 'hover_marker.png',
@@ -170,7 +212,23 @@ function addMarkers(stations) {
     });
     // 添加 mouseout 事件侦听器
     marker.addListener('mouseout', () => {
+<<<<<<< Updated upstream
       marker.setIcon(null); // 将图标设置为 null 以恢复默认图标
+=======
+        // 根据排名设置图标
+        if (station.available_bikes === 0) {
+          marker.setIcon(emptyIcon);
+        } 
+        else if (index === 0) {
+          marker.setIcon(top1Icon);
+        } else if (index === 1) {
+          marker.setIcon(top2Icon);
+        } else if (index === 2) {
+          marker.setIcon(top3Icon);
+        }else {
+        marker.setIcon(null); // 将图标设置为 null 以恢复默认图标
+        }
+>>>>>>> Stashed changes
     });
 
     const contentString = '<div>' +
@@ -303,7 +361,14 @@ function addMarkers(stations) {
         .catch(error => console.log(error));
 
     });
+<<<<<<< Updated upstream
   }
+=======
+
+  }
+
+  
+>>>>>>> Stashed changes
 }
 
 
