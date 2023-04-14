@@ -1,33 +1,130 @@
 
+
+let availabilityData = [];
 let heatmap;
-
-
+let stationsData = [];
 function getStations() {
   fetch("/stations")
     .then((response) => response.json())
-    .then((data) => {
-      console.log("fetch response", typeof data);
-      addMarkers(data);
-      drawHeatmap(data); 
+    .then((stations) => {
+      fetch("/availability") // 获取 availability 表数据的 API
+        .then((response) => response.json())
+        .then((availability) => {
+          // Combine station data with availability data
+          stationsData = stations.map((station) => {
+            const stationAvailability = availability.find(
+              (item) => item.number === station.number
+            );
+            return { ...station, ...stationAvailability };
+          });
+
+          console.log("fetch response", typeof stationsData);
+          addMarkers(stationsData);
+          drawHeatmap(stationsData);
+          populateSearchBoxByNumber(stationsData); // 添加这一行
+        });
     });
 }
 
+
 function initMap() {
-  
   google.charts.load('current', { packages: ['corechart'] });
   const dublin = { lat: 53.35014, lng: -6.266155 };
   // The map, centered at Dublin
-
-
 
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 14,
     center: dublin,
     mapId: "60579be615b58573",//應用自定義樣式
-    
   });
-    const heatmapControlDiv = document.getElementById("heatmap-control");
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(heatmapControlDiv);
+
+  const heatmapControlDiv = document.getElementById("heatmap-control");
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(heatmapControlDiv);
+
+  const searchResultIcon = {
+    url: "http://maps.google.com/mapfiles/kml/pal4/icon47.png", // URL to red marker icon
+    scaledSize: new google.maps.Size(32, 32), // 调整图标大小
+    origin: new google.maps.Point(0, 0), // 图标的起点（左上角）
+    anchor: new google.maps.Point(16, 32), // 图标的定位点相对于图标起点的偏移量（将其设置在底部中心）
+  };
+
+  // Create the search box and link it to the UI element.
+  const input = document.getElementById("search-box");
+  const searchBox = new google.maps.places.SearchBox(input);
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(input);
+  // 添加自定义偏移
+  input.style.marginTop = "10px";
+  input.style.marginLeft = "10px";
+  // Bias the SearchBox results towards current map's viewport.
+  map.addListener("bounds_changed", () => {
+    searchBox.setBounds(map.getBounds());
+  });
+
+  let currentSearchMarker = null;
+  searchBox.addListener("places_changed", () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length === 0) {
+      return;
+    }
+
+    // 在创建新标记之前移除旧标记
+    if (currentSearchMarker) {
+      currentSearchMarker.setMap(null);
+    }
+
+    // For each place, get the icon, name, and location.
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach((place) => {
+      if (!place.geometry) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+
+      // Create a marker for each place.
+      const newMarker = new google.maps.Marker({
+        map,
+        icon: searchResultIcon, // 使用自定义图标
+        title: place.name,
+        position: place.geometry.location,
+      });
+
+      // 将新标记分配给 currentSearchMarker
+      currentSearchMarker = newMarker;
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+
+    map.fitBounds(bounds);
+  });
+
+  const inputNumber = document.getElementById("search-box-number");
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(inputNumber);
+
+  // 添加自定义偏移
+  inputNumber.style.marginTop = "20px";
+  inputNumber.style.marginLeft = "10px";
+
+  inputNumber.addEventListener("change", () => {
+    const stationNumber = parseInt(inputNumber.value, 10);
+    const station = stationsData.find((s) => s.number === stationNumber);
+
+    if (station) {
+      const stationLatLng = new google.maps.LatLng(station.position_lat, station.position_lng);
+      map.setCenter(stationLatLng);
+      map.setZoom(25);
+    } else {
+      alert("Station not found");
+    }
+  });
+
+
+
 
   getStations();
   //setInterval(getStations, 60 * 1000); // 每60秒获取一次实时数据
@@ -40,7 +137,14 @@ let currentInfoWindow = null;
 
 function addMarkers(stations) {
 
+
+
   for (const station of stations) {
+
+  
+    const availableBikes = station.available_bikes;
+
+    
     const hoverIcon = {
       url: 'hover_marker.png',
       scaledSize: new google.maps.Size(60, 60), // 调整图标大小
@@ -59,6 +163,7 @@ function addMarkers(stations) {
       animation: google.maps.Animation.DROP,//添加動畫效果
     });
 
+
     // 添加 mouseover 事件侦听器
     marker.addListener('mouseover', () => {
       marker.setIcon(hoverIcon);
@@ -69,16 +174,17 @@ function addMarkers(stations) {
     });
 
     const contentString = '<div>' +
-      '<h3 id="firstHeading" class="firstHeading">' + station.name + '</h3>' +
+      '<h3 id="firstHeading" class="firstHeading">' + station.number + "." + station.name + '</h3>' +
       '<p><strong>Station Address:   </strong>' + station.address + '</p>' +
-      '<p><strong>Bike Stands:   </strong>' + station.bike_stands + '</p>' +
-      '<p><strong>Bike Number:   </strong>' + station.number + '</p>' +
+      '<p><strong>Original Bike Stands:   </strong>' + station.bike_stands + '</p>' +
+      '<p><strong>Available Bike Number now:   </strong>' + station.available_bikes + '</p>' +
+      '<p><strong>Available Bike stand Number now:   </strong>' + station.available_bike_stands + '</p>' +
       '<p><strong>Business Status:   </strong>' + station.status + '</p>' +
       '<p><strong>View the Number of Bikes available historically</strong></p>' +
       '<input id="inputDate" type="text" placeholder="Enter date (YYYY-MM-DD)"/>' + // 添加输入框
       '<button id="btnLoadData" style="background-color: yellowgreen; color: white; border: none; padding: 5px 12px; font-size: 14px;">Search!</button>' + // 添加带有颜色设置、无边框且更大的按钮
-// 添加带有颜色设置且无边框的按钮
- // 添加带有颜色设置的按钮
+      // 添加带有颜色设置且无边框的按钮
+      // 添加带有颜色设置的按钮
       '</div>';
     //const contentString =node;
 
@@ -223,7 +329,7 @@ function drawHeatmap(stations) {
     data: heatmapData,
     map: null,
   });
-  var gradient = [ 'rgba(102, 204, 0, 0)',  'rgba(102, 204, 0, 1)',  'rgba(187, 255, 0, 1)',  'rgba(255, 238, 0, 1)',  'rgba(255, 153, 0, 1)',  'rgba(255, 102, 0, 1)',];
+  var gradient = ['rgba(102, 204, 0, 0)', 'rgba(102, 204, 0, 1)', 'rgba(187, 255, 0, 1)', 'rgba(255, 238, 0, 1)', 'rgba(255, 153, 0, 1)', 'rgba(255, 102, 0, 1)',];
 
   heatmap.set("radius", 60); // 确保在这里设置正确的半径
   heatmap.set("opacity", 0.6); // 调整这个值以改变不透明度
@@ -262,6 +368,18 @@ function toggleHeatmap(checked) {
 document.getElementById("heatmap-toggle").addEventListener("change", (event) => {
   toggleHeatmap(event.target.checked);
 });
+
+function populateSearchBoxByNumber(stations) {
+  const datalist = document.getElementById("station-numbers");
+
+  stations.forEach((station) => {
+    const option = document.createElement("option");
+    //option.value = station.number;
+    option.innerText = `${station.number} - ${station.name}`; // 在此处添加站点名字
+    datalist.appendChild(option);
+  });
+}
+
 
 
 var map = null;

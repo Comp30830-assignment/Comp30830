@@ -80,6 +80,22 @@ def get_stations():
         return "error in get_stations", 404
     
     
+@app.route("/availability")
+@functools.lru_cache(maxsize=128)
+def get_availability():
+    engine = get_db()
+    sql = "SELECT * FROM availability;"
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text(sql)).fetchall()
+            print('Found {} availability entries', len(rows), rows)
+            return jsonify([row._asdict() for row in rows])
+    except:
+        print(traceback.format_exc())
+        return "error in get_availability", 404
+
+    
+    
     
     
 # @app.route("/occupancy/<int:station_id>")
@@ -146,6 +162,12 @@ def get_occupancy2(station_id, date):
     print(res)
 
     return jsonify(data=json.dumps(list(zip(map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S'), res.index), res.values))))
+    
+
+
+   
+
+    
     
 
 

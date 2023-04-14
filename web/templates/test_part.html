@@ -20,10 +20,15 @@
       <input type="checkbox" id="heatmap-toggle" />
       <label for="heatmap-toggle">Show HeatMap</label>
     </div>
+    <input id="search-box" class="custom-search-box" type="text" placeholder="Enter a location" />
+    
     <div id="map"></div>
     <!--   The `defer` attribute causes the callback to execute after the full HTML
 document has been parsed.   -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA84zGIEaAVXzrTbhAbGUYf50z2bryTnLc&callback=initMap&v=weekly&map_id=60579be615b58573&libraries=visualization&callback=initMap" defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA84zGIEaAVXzrTbhAbGUYf50z2bryTnLc&callback=initMap&v=weekly&map_id=60579be615b58573&libraries=visualization,places" defer></script>
+      
+    <input id="search-box-number" class="custom-search-box2" type="text" placeholder="Search for a bike station by number" list="station-numbers" />
+<datalist id="station-numbers"></datalist>
 
     <div id="chart_div" style="width: 800px; height: 500px;"></div>
     <div id="chart_div2" style="width: 1200px; height: 500px;"></div>
