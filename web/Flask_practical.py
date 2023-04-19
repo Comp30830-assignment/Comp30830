@@ -41,7 +41,7 @@ def connect_to_database():
     #return engine = create_engine("mysql://{user}:{password}@{url}:{port}/{database}".format(config.USER, config.PASSWORD, config.URI, config.PORT, config.DB), echo=True)
     #engine = create_engine("mysql://{user}:{password}@{url}:{port}/{database}".format(user, password, url, port, database), echo=True)
     #engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
-    engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{url}:{port}/{database}", echo=True)
+    engine = create_engine(f"mysql+mysqldb://{user}:{password}@{url}:{port}/{database}", echo=True)
     return engine
     
 def get_db(): 
@@ -68,7 +68,7 @@ def close_connection(exception):
 @functools.lru_cache(maxsize=128)
 def get_stations():
     engine = get_db()
-    sql = "select * from station;"
+    sql = "select * from station ;"
     try:
         with engine.connect() as conn:
             rows = conn.execute(text(sql)).fetchall()
@@ -78,7 +78,24 @@ def get_stations():
     except:
         print(traceback.format_exc())
         return "error in get_stations", 404
+    
+    
+@app.route("/availability")
+@functools.lru_cache(maxsize=128)
+def get_availability():
+    engine = get_db()
+    sql = "SELECT * FROM availability;"
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text(sql)).fetchall()
+            print('Found {} availability entries', len(rows), rows)
+            return jsonify([row._asdict() for row in rows])
+    except:
+        print(traceback.format_exc())
+        return "error in get_availability", 404
 
+    
+    
     
     
 # @app.route("/occupancy/<int:station_id>")
@@ -148,27 +165,21 @@ def get_occupancy2(station_id, date):
     
 
 
+   
+
+    
+    
+
+
 @app.route('/page')
 def page():
-    engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{url}:{port}/{database}", echo=True)
-    sql = """
-    select temp, description from weather_newest order by dt desc limit 1;
-    """
-    weatherInfo = engine.execute(sql).fetchall()
-    icon = engine.execute("select icon from weather_newest order by dt desc limit 1;").fetchone()
-    icon_src = "http://openweathermap.org/img/w/" + str(icon[0]) + ".png"
-    return render_template('test_part.html', weatherInfo=weatherInfo, icon_src=icon_src)
     #return app.send_static_file('index.html')#only use in the static files
     #return "Hello!!!!cat!!!!"
-    # return render_template('test_part.html')
+    return render_template('test_part.html')
 
 @app.route('/sample')
 def index():
       return render_template('index.html')
-
-@app.route('/examfile')
-def exam():
-      return render_template('exam.html')
   
 # @app.route('/mapsample')
 # def index():
