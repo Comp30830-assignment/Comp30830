@@ -3,6 +3,10 @@
 let availabilityData = [];
 let heatmap;
 let stationsData = [];
+let bikeLayer;
+
+
+
 function getStations() {
   fetch("/stations")
     .then((response) => response.json())
@@ -38,8 +42,22 @@ function initMap() {
     mapId: "60579be615b58573",//應用自定義樣式
   });
 
+
+
   const heatmapControlDiv = document.getElementById("heatmap-control");
   map.controls[google.maps.ControlPosition.TOP_RIGHT].push(heatmapControlDiv);
+
+
+  // bikeLayer = new google.maps.BicyclingLayer();
+
+  // const bikeLayerCheckbox = document.getElementById("bikeLayer");
+  // bikeLayerCheckbox.addEventListener("change", toggleBikeLayer);
+
+  // // 如果复选框已选中，则立即调用 toggleBikeLayer
+  // if (bikeLayerCheckbox.checked) {
+  //   toggleBikeLayer();
+  // }
+  
 
   const searchResultIcon = {
     url: "http://maps.google.com/mapfiles/kml/pal4/icon47.png", // URL to red marker icon
@@ -216,10 +234,11 @@ function addMarkers(stations) {
       '<h3 id="firstHeading" class="firstHeading">' + station.number + "." + station.name + '</h3>' +
       '<p><strong>Station Address:   </strong>' + station.address + '</p>' +
       '<p><strong>Original Bike Stands:   </strong>' + station.bike_stands + '</p>' +
-      '<p><strong>Available Bike Number now:   </strong>' + station.available_bikes + '</p>' +
-      '<p><strong>Available Bike stand Number now:   </strong>' + station.available_bike_stands + '</p>' +
+      '<p><strong>Latest Available Bike Number:   </strong>' + station.available_bikes + '</p>' +
+      '<p><strong>Latest Available Bike stand Number:   </strong>' + station.available_bike_stands + '</p>' +
+      '<p><strong>Latest update time:   </strong>' +  new Date(station.last_update ).toLocaleString()  + '</p>' +
       '<p><strong>Business Status:   </strong>' + station.status + '</p>' +
-      '<p><strong>View the Number of Bikes available historically</strong></p>' +
+      '<p style="color: orange;"><strong>View the Number of Bikes available historically</strong></p>' +
       '<input id="inputDate" type="text" placeholder="Enter date (YYYY-MM-DD)"/>' + // 添加输入框
       '<button id="btnLoadData" style="background-color: yellowgreen; color: white; border: none; padding: 5px 12px; font-size: 14px;">Search!</button>' + // 添加带有颜色设置、无边框且更大的按钮
       // 添加带有颜色设置且无边框的按钮
@@ -422,7 +441,18 @@ function populateSearchBoxByNumber(stations) {
   });
 }
 
-
+// function toggleBikeLayer() {
+//   const bikeLayerCheckbox = document.getElementById("bikeLayer");
+//   if (bikeLayerCheckbox.checked) {
+//     bikeLayer.setMap(map);
+//     // 将地图样式设置回默认样式
+//     map.setOptions({ mapId: null });
+//   } else {
+//     bikeLayer.setMap(null);
+//     // 将地图样式设置回自定义样式
+//     map.setOptions({ mapId: "60579be615b58573" });
+//   }
+// }
 
 var map = null;
 window.initMap = initMap;

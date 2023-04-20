@@ -94,6 +94,29 @@ def get_availability():
         print(traceback.format_exc())
         return "error in get_availability", 404
 
+
+# @app.route("/availability")
+# @functools.lru_cache(maxsize=128)
+# def get_availability():
+#     engine = get_db()
+#     sql = "SELECT * FROM availability;"
+#     try:
+#         with engine.connect() as conn:
+#             rows = conn.execute(text(sql)).fetchall()
+#             print('Found {} availability entries', len(rows), rows)
+
+#             # 转换时间戳为分秒格式
+#             formatted_rows = []
+#             for row in rows:
+#                 row_dict = row._asdict()
+#                 row_dict['last_update'] = datetime.utcfromtimestamp(row_dict['last_update']).strftime('%M:%S')
+#                 formatted_rows.append(row_dict)
+
+#             return jsonify(formatted_rows)
+#     except:
+#         print(traceback.format_exc())
+#         return "error in get_availability", 404
+
     
     
     
